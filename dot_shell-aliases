@@ -1,0 +1,20 @@
+# Useful aliases to make my life easier
+alias l="ls -1"
+alias ll="ls -lh"
+alias la="ls -lah"
+alias n="nvim"
+
+# Only on Windows aka in WSL
+if [[ -v WSL_DISTRO_NAME ]]; then
+# MacOS-like open command to open stuff with Windows programs
+mac_like_open() {
+local ARGPATH="$(wslpath -w $1)"
+pushd /mnt/c > /dev/null 2>&1;cmd.exe /C start "" "$ARGPATH";popd > /dev/null 2>&1
+}
+alias open=mac_like_open
+
+# Mimic the MacOS pbcopy and pbpaste commands
+# Using win32yank https://github.com/equalsraf/win32yank
+alias pbcopy="win32yank.exe -i"
+alias pbpaste="win32yank.exe -o"
+fi
