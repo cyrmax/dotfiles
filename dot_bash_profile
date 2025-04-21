@@ -37,3 +37,7 @@ listen_socket "${GPG_AGENT_SOCK_EXTRA}" --gpg S.gpg-agent.extra
 unset wsl2_ssh_pageant_bin
 ###
 
+if [[ -f $HOME/.local/share/../bin/env ]]; then
+. "$HOME/.local/share/../bin/env"
+fi
+
