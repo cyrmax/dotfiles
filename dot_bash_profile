@@ -4,6 +4,8 @@
 
 [[ -f ~/.bashrc ]] && . ~/.bashrc
 
+# Only on Windows aka in WSL
+if [[ -v WSL_DISTRO_NAME ]]; then
 ### https://github.com/BlackReloaded/wsl2-ssh-pageant#bashzsh
 WIN_USER="cyrmax"
 SSH_DIR="${HOME}/.ssh" #
@@ -39,5 +41,6 @@ unset wsl2_ssh_pageant_bin
 
 if [[ -f $HOME/.local/share/../bin/env ]]; then
 . "$HOME/.local/share/../bin/env"
+fi
 fi
 
