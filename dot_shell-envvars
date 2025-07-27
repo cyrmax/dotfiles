@@ -1,32 +1,31 @@
-# General shell behavior
-export HISTSIZE=5000
-export HISTFILESIZE=10000
-export HISTCONTROL=ignoredups:ignorespace
+# ~/.shell-envvars
+#
+# Common environment variables for Bash and Zsh.
+# Should be sourced by ~/.bashrc and ~/.zshenv.
 
-# PATH modifications
+# --- PATH Modifications ---
 export PATH="$HOME/.local/bin:$HOME/bin:$HOME/.bin:$PATH"
 
-# Tools preferences
-export EDITOR=nvim
-export VISUAL=nvim
-export PAGER="nvim -R"
-export MANPAGER="nvim +Man!"
-export MANWIDTH=999 # I don't know for what but people recommend along with nvim as manpager
-export GIT_EDITOR=nvim
-
-# Language specific paths (not necessary present)
-# GoLang
+# --- GoLang ---
 export GOPATH="$HOME/go"
 export PATH="$GOPATH/bin:$PATH"
-# Rust, Cargo and RustUp
+
+# --- Rust, Cargo and RustUp ---
 export RUSTUP_HOME="$HOME/.rustup"
 export CARGO_HOME="$HOME/.cargo"
 export PATH="$CARGO_HOME/bin:$PATH"
 
-# XDG-related stuff. Not tested, not needed, but smart people do recommend
+# --- Tools Preferences ---
+export EDITOR=nvim
+export VISUAL=nvim
+export PAGER="less"
+export MANPAGER="nvim +Man!"
+export MANWIDTH=999 # I don't know for what but people recommend along with nvim as manpager
+
+# --- XDG Base Directory Specification ---
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 
-# Other
+# This is for readline (used by Bash), Zsh uses ZLE so it ignores this.
 export INPUTRC="$HOME/.inputrc"
 

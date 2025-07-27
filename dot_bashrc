@@ -1,25 +1,28 @@
-#
 # ~/.bashrc
-#
+
+# Source common environment variables and aliases
+[ -f ~/.shell-envvars ] && . ~/.shell-envvars
+[ -f ~/.shell-aliases ] && . ~/.shell-aliases
 
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
+# Bash-specific History
+export HISTCONTROL=ignoredups:ignorespace
+export HISTSIZE=5000
+export HISTFILESIZE=10000
+
+# Bash-specific Prompt
 PS1='[\u@\h \W]\$ '
 
-# Source environment variables file
-source $HOME/.shell-envvars
-# Source aliases
-source $HOME/.shell-aliases
-
-# Load pyenv
-
+# Load Pyenv for bash
 #export PYENV_ROOT="$HOME/.pyenv"
 #[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 #eval "$(pyenv init - bash)"
 #eval "$(pyenv virtualenv-init -)"
 
-if [[ -f $HOME/.local/share/../bin/env ]]; then
-. "$HOME/.local/share/../bin/env"
-fi
-
+# Load FFF function for bash
+f() {
+    fff "$@"
+    cd "$(cat "${XDG_CACHE_HOME:=${HOME}/.cache}/fff/.fff_d")"
+}

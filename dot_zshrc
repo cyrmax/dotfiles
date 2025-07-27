@@ -1,0 +1,110 @@
+# ~/.zshrc
+#
+# Loaded for interactive Zsh sessions.
+
+autoload -U compinit
+compinit
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+setopt menu_complete
+
+# ======== Plugin Manager (Zinit) ========
+# A fast and powerful plugin manager.
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+[ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
+[ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+source "${ZINIT_HOME}/zinit.zsh"
+
+#zinit light starship/starship
+zinit light zsh-users/zsh-completions
+zinit light zsh-users/zsh-history-substring-search
+#zinit light Aloxaf/fzf-tab
+
+# ======== Prompt ========
+# A simple but effective prompt showing [user@host directory]
+# For more power, consider Starship (https://starship.rs)
+PROMPT='[%n@%m %~]%# '
+# -----------------------------------------------------------
+
+
+# ======== Keybindings (Standard Linux/Bash Feel) ========
+# Use emacs-style bindings (this is the default and provides the "standard" feel)
+bindkey -e
+
+# Arrow keys are typically automatically bound by zsh.
+# These bindings ensure Home, End, Delete, and Ctrl+Backspace work as expected.
+bindkey '^[[H' beginning-of-line       # Home
+bindkey '^[[F' end-of-line           # End
+bindkey "${terminfo[khome]}" beginning-of-line
+bindkey "${terminfo[kend]}" end-of-line
+bindkey '\e[3~' delete-char          # Delete
+bindkey '^[[3~' delete-char          # Delete (alternative)
+bindkey '^?' backward-delete-char    # Backspace
+bindkey '^H' backward-kill-word      # Ctrl+Backspace
+# -----------------------------------------------------------
+
+
+# ======== Options & Environment ========
+# Source aliases file (compatible with bash)
+if [ -f ~/.shell-aliases ]; then
+    . ~/.shell-aliases
+fi
+
+# Pyenv initialization (Zsh compatible)
+export PYENV_ROOT="$HOME/.pyenv"
+if [[ -d $PYENV_ROOT/bin ]]; then
+    export PATH="$PYENV_ROOT/bin:$PATH"
+fi
+if command -v pyenv 1>/dev/null 2>&1; then
+    eval "$(pyenv init - zsh)"
+    eval "$(pyenv virtualenv-init - zsh)"
+fi
+
+# Your other env loader from ~/.bashrc. This might be redundant
+# if it was already loaded by .zprofile, but interactive sessions
+# are not always login shells.
+if [[ -f $HOME/.local/share/../bin/env ]]; then
+    . "$HOME/.local/share/../bin/env"
+fi
+# -----------------------------------------------------------
+
+
+# ======== Functions ========
+# FFF file manager configuration
+export FFF_LS_COLORS=0
+export FFF_FILE_FORMAT="%f"
+export FFF_MARK_FORMAT="* %f"
+export FFF_TRASH_CMD="mv"
+
+f() {
+    fff "$@"
+    # Zsh has a smarter way to handle this with chpwd hooks, but this works fine
+    local d
+    d=$(cat "${XDG_CACHE_HOME:=${HOME}/.cache}/fff/.fff_d")
+    if [[ -d "$d" && "$d" != "$PWD" ]]; then
+        cd "$d"
+    fi
+}
+
+# The gpgforward script's content seems more suited for one-time execution,
+# but if you need the socat command to re-run in every new terminal, you could
+# place this function here and call it.
+# function gpg-forward-connect {
+#     socat - UNIX-CONNECT:"$HOME/.gnupg/S.gpg-agent.ssh" &
+# }
+# -----------------------------------------------------------
+#
+
+### Added by Zinit's installer
+if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
+    print -P "%F{33} %F{220}Installing %F{33}ZDHARMA-CONTINUUM%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
+    command mkdir -p "$HOME/.local/share/zinit" && command chmod g-rwX "$HOME/.local/share/zinit"
+    command git clone https://github.com/zdharma-continuum/zinit "$HOME/.local/share/zinit/zinit.git" && \
+        print -P "%F{33} %F{34}Installation successful.%f%b" || \
+        print -P "%F{160} The clone has failed.%f%b"
+fi
+
+source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+### End of Zinit's installer chunk
+eval "$(starship init zsh)"

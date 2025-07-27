@@ -1,0 +1,61 @@
+# ~/.config/starship.toml
+
+[character]
+success_symbol = '[%](bold green) '
+error_symbol = '[x](bold red) '
+
+[directory]
+disabled = false
+
+[status]
+#symbol = "[X](bold red) "
+#success_symbol = "[✔](bold green) "
+disabled = false
+
+[git_branch]
+symbol = "git: " # A branch symbol (requires a Nerd Font) or use "git:"
+
+[git_state]
+disabled = false
+
+[git_status]
+# Symbols for different git states
+conflicted = "="
+ahead = "↑"
+behind = "↓"
+diverged = "⇕"
+untracked = "?"
+stashed = "$"
+modified = "!"
+staged = "+"
+renamed = "»"
+deleted = "✘"
+
+# --- A more minimal format ---
+# This changes the prompt layout to be a single line for simplicity.
+#format = """
+#[╭─ ](bold green)$directory$git_branch$git_status
+#[╰─$character ](bold green)"""
+
+[line_break]
+disabled = true
+
+[nodejs]
+disabled = true
+[golang]
+disabled = false
+[python]
+disabled = true
+[docker_context]
+disabled = true
+[pijul_channel]
+disabled = true
+[pulumi]
+disabled =true
+[aws]
+disabled = true
+[netns]
+disabled = true
+[container]
+disabled = true
+

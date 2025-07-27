@@ -1,0 +1,56 @@
+# ~/.zprofile
+#
+# Loaded only for Zsh login shells.
+
+# Source the environment, ensuring it's available for login shells
+if [[ -f ~/.zshenv ]]; then
+  source ~/.zshenv
+fi
+
+# Only run this on Windows Subsystem for Linux
+if [[ -v WSL_DISTRO_NAME ]]; then
+  WIN_USER="cyrmax"
+  SSH_DIR="${HOME}/.ssh"
+  mkdir -p "${SSH_DIR}"
+  wsl2_ssh_pageant_bin="${SSH_DIR}/wsl2-ssh-pageant.exe"
+  
+  # Link the exe from the Windows mount if not already present
+  if [[ ! -x "$wsl2_ssh_pageant_bin" ]]; then
+      ln -sf "/mnt/c/Users/${WIN_USER}/.ssh/wsl2-ssh-pageant.exe" "${wsl2_ssh_pageant_bin}"
+  fi
+
+  listen_socket() {
+    local sock_path="$1" && shift
+    local fork_args="${sock_path},fork"
+    local exec_args="${wsl2_ssh_pageant_bin} $@"
+
+    # Check if the socat process is already running for this socket
+    if ! pgrep -f "socat UNIX-LISTEN:${fork_args}" > /dev/null; then
+      rm -f "${sock_path}"
+      (setsid nohup socat "UNIX-LISTEN:${fork_args}" "EXEC:${exec_args}" &>/dev/null &)
+    fi
+  }
+
+  # SSH Agent
+  export SSH_AUTH_SOCK="${SSH_DIR}/agent.sock"
+  listen_socket "${SSH_AUTH_SOCK}"
+
+  # GPG Agent
+  export GPG_AGENT_SOCK="${HOME}/.gnupg/S.gpg-agent"
+  listen_socket "${GPG_AGENT_SOCK}" --gpg S.gpg-agent
+
+  # GPG extra for VS Code Devcontainers
+  export GPG_AGENT_SOCK_EXTRA="${HOME}/.gnupg/S.gpg-agent.extra"
+  listen_socket "${GPG_AGENT_SOCK_EXTRA}" --gpg S.gpg-agent.extra
+
+  unset WIN_USER SSH_DIR wsl2_ssh_pageant_bin listen_socket
+fi
+
+# The GPG TTY needs to be set for gpg-agent to work correctly with pinentry
+export GPG_TTY=$(tty)
+
+# Your other non-standard env loader from ~/.profile and ~/.bash_profile
+if [[ -f $HOME/.local/share/../bin/env ]]; then
+  . "$HOME/.local/share/../bin/env"
+fi
+
