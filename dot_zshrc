@@ -108,3 +108,8 @@ autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 ### End of Zinit's installer chunk
 eval "$(starship init zsh)"
+
+# Start tmux on login
+if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ]; then
+  tmux attach-session || tmux new-session
+fi
