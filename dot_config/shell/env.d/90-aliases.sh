@@ -7,3 +7,8 @@ f() {
     local d=$(cat "${XDG_CACHE_HOME:=${HOME}/.cache}/fff/.fff_d")
     [ -d "$d" ] && [ "$d" != "$PWD" ] && cd "$d"
 }
+
+check_tool xclip
+alias pbcopy='xclip -selection clipboard'
+alias pbpaste='xclip -selection clipboard -o'
+
