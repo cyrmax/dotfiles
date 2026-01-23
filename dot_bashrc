@@ -1,34 +1,6 @@
-# ~/.bashrc
-
-# Source common environment variables and aliases
-[ -f ~/.shell-envvars ] && . ~/.shell-envvars
-[ -f ~/.shell-aliases ] && . ~/.shell-aliases
-
-# If not running interactively, don't do anything
 [[ $- != *i* ]] && return
-
-# Bash-specific History
 export HISTCONTROL=ignoredups:ignorespace
 export HISTSIZE=5000
 export HISTFILESIZE=10000
-
-# Bash-specific Prompt
 PS1='[\u@\h \W]\$ '
-
-# Load Pyenv for bash
-#export PYENV_ROOT="$HOME/.pyenv"
-#[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-#eval "$(pyenv init - bash)"
-#eval "$(pyenv virtualenv-init -)"
-
-# Load FFF function for bash
-f() {
-    fff "$@"
-    cd "$(cat "${XDG_CACHE_HOME:=${HOME}/.cache}/fff/.fff_d")"
-}
-
-. "$HOME/.local/share/../bin/env"
-
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+[ -f "$HOME/.config/shell/loader.sh" ] && . "$HOME/.config/shell/loader.sh"
