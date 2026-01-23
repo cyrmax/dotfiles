@@ -85,15 +85,6 @@ f() {
     fi
 }
 
-# The gpgforward script's content seems more suited for one-time execution,
-# but if you need the socat command to re-run in every new terminal, you could
-# place this function here and call it.
-# function gpg-forward-connect {
-#     socat - UNIX-CONNECT:"$HOME/.gnupg/S.gpg-agent.ssh" &
-# }
-# -----------------------------------------------------------
-#
-
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
     print -P "%F{33} %F{220}Installing %F{33}ZDHARMA-CONTINUUM%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
@@ -109,7 +100,17 @@ autoload -Uz _zinit
 ### End of Zinit's installer chunk
 eval "$(starship init zsh)"
 
+eval "$(/usr/sbin/wsl2-ssh-agent)"
+
 # Start tmux on login
 if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ]; then
   tmux attach-session || tmux new-session
 fi
+
+export NVM_DIR="$HOME/.config/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"

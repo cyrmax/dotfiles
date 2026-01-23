@@ -4,7 +4,7 @@
 # Should be sourced by ~/.bashrc and ~/.zshenv.
 
 # --- PATH Modifications ---
-export PATH="$HOME/.local/bin:$HOME/bin:$HOME/.bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/bin:$HOME/.bin:$HOME/vcpkg:$PATH"
 
 # --- GoLang ---
 export GOPATH="$HOME/go"
@@ -28,4 +28,13 @@ export XDG_DATA_HOME="$HOME/.local/share"
 
 # This is for readline (used by Bash), Zsh uses ZLE so it ignores this.
 export INPUTRC="$HOME/.inputrc"
+
+# vcpkg
+if command -v vcpkg &> /dev/null; then
+export VCPKG_DISABLE_METRICS=1
+export VCPKG_ROOT="$HOME/vcpkg"
+fi
+
+# Ansible config
+export ANSIBLE_INVENTORY="$HOME/infraconf/ansible/inventory.ini"
 
