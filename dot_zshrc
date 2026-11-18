@@ -1,19 +1,68 @@
+# Automatically enter tmux.
+# Replace this shell to avoid returning to it after tmux exits.
+if [[ -z "${TMUX:-}" && -z "${CYRMAX_NO_TMUX:-}" && -t 0 && -t 1 ]] \
+    && command -v tmux >/dev/null 2>&1; then
+    exec tmux new-session -A -s main
+fi
+
 autoload -U compinit && compinit
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 setopt menu_complete HIST_IGNORE_DUPS HIST_IGNORE_SPACE
 
-ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-[ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
-[ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-source "${ZINIT_HOME}/zinit.zsh"
-zinit light zsh-users/zsh-completions
-zinit light zsh-users/zsh-history-substring-search
+# Optional Zinit plugin manager.
+ZINIT_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
 
-eval "$(starship init zsh)"
+zi-install() {
+    if [[ -f "$ZINIT_HOME/zinit.zsh" ]]; then
+        print "Zinit is already installed."
+        return 0
+    fi
+
+    if [[ -e "$ZINIT_HOME" ]]; then
+        print -u2 "Zinit directory exists but installation is incomplete: $ZINIT_HOME"
+        return 1
+    fi
+
+    if ! command -v git >/dev/null 2>&1; then
+        print -u2 "Git is required to install Zinit."
+        return 1
+    fi
+
+    mkdir -p -- "${ZINIT_HOME:h}" || return 1
+
+    git clone --depth 1 \
+        https://github.com/zdharma-continuum/zinit.git \
+        "$ZINIT_HOME" || return 1
+
+    print "Zinit installed. Restart the shell with: exec zsh"
+}
+
+if [[ -r "$ZINIT_HOME/zinit.zsh" ]]; then
+    if source "$ZINIT_HOME/zinit.zsh"; then
+        autoload -Uz _zinit
+        (( ${+_comps} )) && _comps[zinit]=_zinit
+
+        zinit light zsh-users/zsh-completions
+        zinit light zsh-users/zsh-history-substring-search
+    else
+        print -u2 "Warning: failed to load Zinit."
+    fi
+else
+    print -u2 "Warning: Zinit is not installed. Run: zi-install"
+fi
+
+# Optional Starship prompt.
+if command -v starship >/dev/null 2>&1; then
+    if starship_init="$(starship init zsh)"; then
+        eval "$starship_init"
+    else
+        print -u2 "Warning: Starship initialization failed."
+    fi
+    unset starship_init
+else
+    print -u2 "Warning: Starship is not installed. On Arch: sudo pacman -S starship"
+fi
+
 bindkey -e
 [ -f "$HOME/.config/shell/loader.sh" ] && . "$HOME/.config/shell/loader.sh"
-
-if command -v tmux >/dev/null 2>&1 && [ -z "$TMUX" ]; then
-    tmux attach-session || tmux new-session
-fi
 
