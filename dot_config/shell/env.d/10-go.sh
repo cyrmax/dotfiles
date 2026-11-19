@@ -1,3 +1,11 @@
-export GOPATH="$HOME/go"
-export PATH="$GOPATH/bin:$PATH"
-check_tool "go"
+# Go environment.
+: "${GOPATH:=$HOME/go}"
+export GOPATH
+
+case ":$PATH:" in
+    *":$GOPATH/bin:"*) ;;
+    *) PATH="$GOPATH/bin:$PATH" ;;
+esac
+export PATH
+
+check_tool go

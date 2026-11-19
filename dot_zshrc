@@ -1,3 +1,8 @@
+# Common interactive environment.
+if [[ -r "$HOME/.config/shell/loader.sh" ]]; then
+    source "$HOME/.config/shell/loader.sh"
+fi
+
 # Automatically enter tmux in SSH and graphical terminals.
 # Do not start tmux on physical Linux consoles.
 if [[ -z "${TMUX:-}" && -z "${CYRMAX_NO_TMUX:-}" && -t 0 && -t 1 ]] \
@@ -8,7 +13,6 @@ fi
 
 autoload -U compinit && compinit
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
-setopt menu_complete HIST_IGNORE_DUPS HIST_IGNORE_SPACE
 
 # Optional Zinit plugin manager.
 ZINIT_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/zinit/zinit.git"
@@ -65,5 +69,4 @@ else
 fi
 
 bindkey -e
-[ -f "$HOME/.config/shell/loader.sh" ] && . "$HOME/.config/shell/loader.sh"
 

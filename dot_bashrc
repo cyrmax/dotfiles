@@ -1,6 +1,3 @@
 [[ $- != *i* ]] && return
-export HISTCONTROL=ignoredups:ignorespace
-export HISTSIZE=5000
-export HISTFILESIZE=10000
 PS1='[\u@\h \W]\$ '
 [ -f "$HOME/.config/shell/loader.sh" ] && . "$HOME/.config/shell/loader.sh"
