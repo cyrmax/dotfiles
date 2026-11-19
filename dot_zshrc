@@ -1,6 +1,7 @@
-# Automatically enter tmux.
-# Replace this shell to avoid returning to it after tmux exits.
+# Automatically enter tmux in SSH and graphical terminals.
+# Do not start tmux on physical Linux consoles.
 if [[ -z "${TMUX:-}" && -z "${CYRMAX_NO_TMUX:-}" && -t 0 && -t 1 ]] \
+    && [[ -n "${SSH_TTY:-}${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]] \
     && command -v tmux >/dev/null 2>&1; then
     exec tmux new-session -A -s main
 fi
