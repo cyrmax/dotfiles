@@ -1,0 +1,11 @@
+--- a/usr/lib/python3.14/site-packages/orca/preferences_window.py
++++ b/usr/lib/python3.14/site-packages/orca/preferences_window.py
+@@ -557,7 +557,7 @@
+         self._set_height_from_sidebar()
+         self.stack.set_transition_type(Gtk.StackTransitionType.CROSSFADE)
+         self.stack.set_transition_duration(150)
+-        OrcaSetupGUI.WINDOW.present_with_time(time.time())
++        GLib.idle_add(OrcaSetupGUI.WINDOW.present_with_time, time.time())
+         GLib.timeout_add(500, self.resume_events)
+ 
+         # Set accessible name after window is realized
