@@ -1,0 +1,11 @@
+[Unit]
+Description=Windows GnuPG SSH agent bridge for WSL
+
+[Socket]
+ListenStream=%t/gnupg/S.gpg-agent.ssh
+Accept=yes
+SocketMode=0600
+DirectoryMode=0700
+
+[Install]
+WantedBy=sockets.target

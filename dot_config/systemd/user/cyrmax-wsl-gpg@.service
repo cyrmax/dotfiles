@@ -1,0 +1,9 @@
+[Unit]
+Description=Windows GnuPG agent bridge connection
+CollectMode=inactive-or-failed
+
+[Service]
+ExecStart=%h/.ssh/wsl2-ssh-pageant.exe --gpgConfigBasepath C:/Users/cyrmax/AppData/Local/gnupg --gpg S.gpg-agent
+StandardInput=socket
+StandardOutput=inherit
+StandardError=journal

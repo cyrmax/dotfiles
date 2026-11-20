@@ -1,2 +1,9 @@
 .config/shell/toolignore
 .config/shell/toolignore
+
+# Windows GnuPG bridges: deploy only inside WSL.
+{{ if ne .chezmoi.os "linux" }}
+.config/systemd/user/cyrmax-wsl-*
+{{ else if not (.chezmoi.kernel.osrelease | lower | contains "microsoft") }}
+.config/systemd/user/cyrmax-wsl-*
+{{ end }}
