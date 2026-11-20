@@ -3,12 +3,17 @@ if [[ -r "$HOME/.config/shell/loader.sh" ]]; then
     source "$HOME/.config/shell/loader.sh"
 fi
 
-# Automatically enter tmux in SSH and graphical terminals.
-# Do not start tmux on physical Linux consoles.
+# Automatically enter isolated tmux servers for SSH and GUI.
+# Do not start tmux automatically on physical Linux consoles.
 if [[ -z "${TMUX:-}" && -z "${CYRMAX_NO_TMUX:-}" && -t 0 && -t 1 ]] \
-    && [[ -n "${SSH_TTY:-}${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]] \
     && command -v tmux >/dev/null 2>&1; then
-    exec tmux new-session -A -s main
+
+    if [[ -n "${SSH_TTY:-}${SSH_CONNECTION:-}" ]]; then
+        exec tmux -L ssh new-session -A -s main
+
+    elif [[ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]]; then
+        exec tmux -L gui new-session -A -s main
+    fi
 fi
 
 autoload -U compinit && compinit
