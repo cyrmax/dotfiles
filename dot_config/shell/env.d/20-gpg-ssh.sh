@@ -44,3 +44,11 @@ _cyrmax_configure_ssh_agent() {
 
 _cyrmax_configure_ssh_agent
 unset -f _cyrmax_configure_ssh_agent
+
+# Direct GPG-agent prompts to the current SSH terminal.
+# Do not touch a forwarded SSH agent.
+if [[ -n "${SSH_CONNECTION:-}" && -n "${GPG_TTY:-}" ]] &&
+   command -v gpg-connect-agent >/dev/null 2>&1 &&
+   [[ "${SSH_AUTH_SOCK:-}" == "$(gpgconf --list-dirs agent-ssh-socket 2>/dev/null)" ]]; then
+    gpg-connect-agent UPDATESTARTUPTTY /bye >/dev/null 2>&1 || true
+fi
