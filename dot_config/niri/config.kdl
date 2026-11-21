@@ -1,0 +1,74 @@
+// Accessibility
+spawn-at-startup "orca"
+
+// Start an accessible terminal automatically
+spawn-at-startup "xfce4-terminal"
+
+// Keyboard shortcuts
+binds {
+    // Applications
+    Mod+T { spawn "xfce4-terminal" "--disable-server"; }
+    Mod+D { spawn "xfce4-appfinder"; }
+
+    // Orca
+    Super+Alt+S { spawn "orca" "--replace" "--enable=speech"; }
+
+    // Window management
+    Mod+Q { close-window; }
+    Mod+M { maximize-window-to-edges; }
+    Mod+F { maximize-column; }
+    Mod+Shift+F { fullscreen-window; }
+
+    Mod+Left { focus-column-left; }
+    Mod+Right { focus-column-right; }
+    Mod+Up { focus-window-up; }
+    Mod+Down { focus-window-down; }
+
+    Mod+Ctrl+Left { move-column-left; }
+    Mod+Ctrl+Right { move-column-right; }
+
+    Mod+Ctrl+Space { toggle-window-floating; }
+
+    // Audio
+    XF86AudioRaiseVolume {
+        spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05+";
+    }
+    XF86AudioLowerVolume {
+        spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.05-";
+    }
+    XF86AudioMute {
+        spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SINK@" "toggle";
+    }
+    XF86AudioMicMute {
+        spawn "wpctl" "set-mute" "@DEFAULT_AUDIO_SOURCE@" "toggle";
+    }
+
+    // Display brightness
+    XF86MonBrightnessUp {
+        spawn "brightnessctl" "--class=backlight" "set" "+5%";
+    }
+    XF86MonBrightnessDown {
+        spawn "brightnessctl" "--class=backlight" "set" "5%-";
+    }
+
+    // Session
+    Mod+Shift+E { quit; }
+
+// Screen reading switches
+Mod+B repeat=false {
+    spawn "/home/cyrmax/.local/bin/screen-reader-mode" "brltty";
+}
+
+Mod+O repeat=false {
+    spawn "/home/cyrmax/.local/bin/screen-reader-mode" "orca";
+}
+
+Mod+grave repeat=false {
+    spawn "/home/cyrmax/.local/bin/screen-reader-mode" "toggle";
+}
+}
+
+// Use no window animations initially
+animations {
+    off
+}

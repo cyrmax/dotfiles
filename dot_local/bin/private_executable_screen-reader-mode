@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mode="${1:-}"
+unit=brltty-gui.service
+runtime="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
+log="$HOME/.cache/screen-reader-switch.log"
+
+
+exec 9>"$runtime/screen-reader-switch-v2.lock"
+flock -w 3 -x 9 || { echo "Lock timeout" >&2; exit 1; }
+
+brltty_active() {
+    /usr/bin/systemctl is-active --quiet "$unit"
+}
+
+start_orca() {
+    nohup /usr/bin/orca --replace >>"$log" 2>&1 </dev/null 9>&- &
+}
+
+to_orca() {
+    /usr/bin/sudo -n /usr/bin/systemctl stop "$unit"
+    start_orca
+}
+
+to_brltty() {
+    if ! /usr/bin/sudo -n /usr/bin/systemctl restart "$unit"; then
+        start_orca
+        exit 1
+    fi
+
+    if ! brltty_active; then
+        start_orca
+        exit 1
+    fi
+
+    /usr/bin/pkill -TERM -u "$(id -u)" -x orca || true
+}
+
+case "$mode" in
+    orca)
+        to_orca
+        ;;
+    brltty)
+        to_brltty
+        ;;
+    toggle)
+        if brltty_active; then
+            to_orca
+        else
+            to_brltty
+        fi
+        ;;
+    *)
+        echo "Usage: $0 {orca|brltty|toggle}" >&2
+        exit 2
+        ;;
+esac
