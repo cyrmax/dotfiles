@@ -1,0 +1,96 @@
+#!/bin/sh
+set -eu
+
+case "${1:-}" in
+    "") mode=brief ;;
+    -t|--time) mode=time ;;
+    -d|--details) mode=details ;;
+    -h|--help)
+        printf 'Usage: bat [-t|--time|-d|--details]\n'
+        exit 0 ;;
+    *)
+        printf 'Usage: bat [-t|--time|-d|--details]\n' >&2
+        exit 2 ;;
+esac
+
+[ "$#" -le 1 ] || {
+    printf 'Too many arguments\n' >&2
+    exit 2
+}
+
+battery=/org/freedesktop/UPower/devices/battery_BAT0
+
+if ! data=$(LC_ALL=C upower -i "$battery"); then
+    printf 'Cannot read battery information\n' >&2
+    exit 1
+fi
+
+printf '%s\n' "$data" | awk -v mode="$mode" '
+function mins(s,    p,n,v) {
+    n=split(s,p,/[[:space:]]+/)
+    if(n < 2 || p[1] !~ /^[0-9]+([.][0-9]+)?$/) return -1
+    v=p[1]+0
+    if(p[2] ~ /^second/) return int(v/60+0.5)
+    if(p[2] ~ /^minute/) return int(v+0.5)
+    if(p[2] ~ /^hour/) return int(v*60+0.5)
+    if(p[2] ~ /^day/) return int(v*1440+0.5)
+    return -1
+}
+function estimated(s, suffix,    m) {
+    m=mins(s)
+    if(m < 0) return "estimate unavailable"
+    if(m >= 60) return "approximately " int(m/60) "h " m%60 "m " suffix
+    return "approximately " m "m " suffix
+}
+{
+    line=$0
+    sub(/^[[:space:]]+/, "", line)
+    p=index(line, ":")
+    if(!p) next
+    key=substr(line, 1, p-1)
+    value=substr(line, p+1)
+    sub(/^[[:space:]]+/, "", value)
+
+    if (key=="state") state=value
+    if (key=="percentage") { percent=value; sub(/%$/, "", percent) }
+    if (key=="time to full") tofull=value
+    if (key=="time to empty") toempty=value
+    if (key=="energy") energy=value
+    if (key=="energy-full") energyfull=value
+    if (key=="energy-full-design") design=value
+    if (key=="energy-rate") rate=value
+    if (key=="voltage") voltage=value
+    if (key=="capacity") capacity=value
+}
+END {
+    if (state=="" || percent=="") {
+        print "Battery data unavailable" > "/dev/stderr"
+        exit 1
+    }
+
+    status=state
+    gsub(/-/, " ", status)
+
+    if (mode=="brief") {
+        print percent " percent " status
+    } else if (mode=="time") {
+        if (state=="charging")
+            print "charging, " estimated(tofull,"to full")
+        else if (state=="discharging")
+            print "discharging, " estimated(toempty,"left on battery")
+        else
+            print status
+    } else {
+        print percent " percent " status
+        if (energy!="") print "energy: " energy
+        if (energyfull!="") print "energy full: " energyfull
+        if (design!="") print "design capacity: " design
+        if (capacity!="") print "battery health: " capacity
+        if (rate!="") print "battery energy rate: " rate
+        if (voltage!="") print "voltage: " voltage
+        if (state=="charging" && tofull!="")
+            print "time to full: " tofull
+        if (state=="discharging" && toempty!="")
+            print "time to empty: " toempty
+    }
+}'
